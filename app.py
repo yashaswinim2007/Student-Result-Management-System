@@ -3,21 +3,38 @@ import sqlite3
 
 # Clean browser page setup
 st.set_page_config(page_title="Student Result Management System", layout="wide")
+
+# 🔥 FORCE HIDE ALL WATERMARKS, FOOTERS, AND MENUS (DESKTOP & MOBILE)
+force_clean_style = """
+    <style>
+    /* Hide top header bar completely */
+    header {visibility: hidden !important;}
+    
+    /* Hide bottom footer watermark completely */
+    footer {visibility: hidden !important;}
+    
+    /* Hide top right burger menu button */
+    #MainMenu {visibility: hidden !important;}
+    
+    /* Hide the deploy and viewer status overlays */
+    .stAppDeployButton {display: none !important;}
+    .viewerBadge {display: none !important;}
+    
+    /* Adjust padding so top gap looks professional */
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 0rem !important;
+    }
+    </style>
+"""
+st.markdown(force_clean_style, unsafe_allow_html=True)
+
 st.title("🎓 Student Result Management System")
 st.write("---")
 
-# 🔒 HIDE STREAMLIT WATERMARKS AND MENUS
-hide_st_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_st_style, unsafe_allow_html=True)
-
 # Connect to your existing database file
 conn = sqlite3.connect('rms.db')  
+cursor = conn.conn = sqlite3.connect('rms.db')
 cursor = conn.cursor()
 
 # Create tables if they don't exist yet
