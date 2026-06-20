@@ -4,41 +4,35 @@ import sqlite3
 # Clean browser page setup
 st.set_page_config(page_title="Student Result Management System", layout="wide")
 
-# 🚫 COVERT MODE: Erases every single trace of Streamlit branding
-ultra_clean_style = """
+# 🔥 FORCE HIDE ALL WATERMARKS, FOOTERS, AND MENUS (DESKTOP & MOBILE)
+force_clean_style = """
     <style>
-    /* Hide the footer and any text inside it */
-    footer {
-        visibility: hidden !important;
-        display: none !important;
-        height: 0px !important;
-    }
+    /* Hide top header bar completely */
+    header {visibility: hidden !important;}
     
-    /* Remove the header bar background and default buttons */
-    header {
-        visibility: hidden !important;
-        display: none !important;
-    }
+    /* Hide bottom footer watermark completely */
+    footer {visibility: hidden !important;}
     
-    /* Target and destroy the red "Hosted with Streamlit" colored banner specifically */
-    .stAppDeployButton, .viewerBadge, [data-testid="stStatusWidget"], .css-z5fcl4, .ef3psqc5 {
-        display: none !important;
-        visibility: hidden !important;
-    }
+    /* Hide top right burger menu button */
+    #MainMenu {visibility: hidden !important;}
     
-    /* Hide the hamburger menu icon entirely */
-    #MainMenu {
-        visibility: hidden !important;
-        display: none !important;
+    /* Hide the deploy and viewer status overlays */
+    .stAppDeployButton {display: none !important;}
+    .viewerBadge {display: none !important;}
+    
+    /* Adjust padding so top gap looks professional */
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 0rem !important;
     }
     </style>
 """
-st.markdown(ultra_clean_style, unsafe_allow_html=True)
+st.markdown(force_clean_style, unsafe_allow_html=True)
 
 st.title("🎓 Student Result Management System")
 st.write("---")
 
-# Database connection
+# 🛠️ FIXED DATABASE CONNECTION
 conn = sqlite3.connect('rms.db')
 cursor = conn.cursor()
 
@@ -55,9 +49,12 @@ conn.commit()
 menu = ["📊 Dashboard", "📝 Manage Courses", "👥 Manage Students", "🏆 View & Add Results"]
 choice = st.sidebar.selectbox("Main Navigation Menu", menu)
 
+# ==========================================
 # PAGE 1: MAIN DASHBOARD
+# ==========================================
 if choice == "📊 Dashboard":
     st.subheader("📊 System Overview Dashboard")
+    
     try:
         total_courses = cursor.execute("SELECT COUNT(*) FROM course").fetchone()[0]
         total_students = cursor.execute("SELECT COUNT(*) FROM student").fetchone()[0]
@@ -73,26 +70,35 @@ if choice == "📊 Dashboard":
     with col3:
         st.warning(f"### Results Published\n## {total_results}")
 
+# ==========================================
 # PAGE 2: COURSE MANAGEMENT
+# ==========================================
 elif choice == "📝 Manage Courses":
     st.subheader("📝 Course Management Panel")
+    
     with st.form("course_form", clear_on_submit=True):
         course_name = st.text_input("Course Name")
-        duration = st.text_input("Duration")
+        duration = st.text_input("Duration (e.g., 3 Months)")
         description = st.text_area("Course Description")
         submit = st.form_submit_button("Save Course Details")
+        
         if submit and course_name:
             cursor.execute("INSERT INTO course (name, duration, description) VALUES (?,?,?)", (course_name, duration, description))
             conn.commit()
             st.success(f"Successfully Added: {course_name}")
             st.rerun()
+
+    st.write("### 🗃️ Saved Courses")
     courses_data = cursor.execute("SELECT * FROM course").fetchall()
     if courses_data:
         st.dataframe(courses_data, use_container_width=True)
 
+# ==========================================
 # PAGE 3: STUDENT MANAGEMENT
+# ==========================================
 elif choice == "👥 Manage Students":
     st.subheader("👥 Student Registration & Management")
+    
     with st.form("student_form", clear_on_submit=True):
         col1, col2 = st.columns(2)
         with col1:
@@ -103,23 +109,32 @@ elif choice == "👥 Manage Students":
             course_assigned = st.text_input("Course Name")
             contact = st.text_input("Contact Number")
             gender = st.selectbox("Gender", ["Male", "Female", "Other"])
+            
         submit = st.form_submit_button("Register Student")
+        
         if submit and roll and name:
             try:
-                cursor.execute("INSERT INTO student (roll, name, email, gender, contact, course) VALUES (?,?,?,?,?,?)", (roll, name, email, gender, contact, course_assigned))
+                cursor.execute("INSERT INTO student (roll, name, email, gender, contact, course) VALUES (?,?,?,?,?,?)", 
+                               (roll, name, email, gender, contact, course_assigned))
                 conn.commit()
                 st.success(f"Registered Student: {name}")
                 st.rerun()
             except:
                 st.error("Roll Number already exists!")
+
+    st.write("### 🗃️ Registered Students List")
     students_data = cursor.execute("SELECT roll, name, email, gender, contact, course FROM student").fetchall()
     if students_data:
         st.dataframe(students_data, use_container_width=True)
 
+# ==========================================
 # PAGE 4: VIEW & ADD RESULTS
+# ==========================================
 elif choice == "🏆 View & Add Results":
     st.subheader("🏆 Student Results Portal")
+    
     tab1, tab2 = st.tabs(["🔍 View Student Results", "➕ Add New Result Entry"])
+    
     with tab1:
         search_roll = st.text_input("Enter Student Roll Number to Search")
         if search_roll:
@@ -132,9 +147,13 @@ elif choice == "🏆 View & Add Results":
                 st.info(f"**Percentage:** {res[6]}%")
             else:
                 st.error("No result records found for this Roll Number.")
+                
+        st.write("---")
+        st.write("### 🗃️ Overall Published Results Ledger")
         results_data = cursor.execute("SELECT * FROM result").fetchall()
         if results_data:
             st.dataframe(results_data, use_container_width=True)
+            
     with tab2:
         with st.form("result_form", clear_on_submit=True):
             r_roll = st.text_input("Student Roll Number")
@@ -142,10 +161,12 @@ elif choice == "🏆 View & Add Results":
             r_course = st.text_input("Course Name")
             marks_ob = st.number_input("Marks Obtained", min_value=0, max_value=100, value=0)
             full_marks = st.number_input("Full Marks", min_value=10, max_value=100, value=100)
+            
             submit_res = st.form_submit_button("Publish Result")
             if submit_res and r_roll:
                 percentage = round((marks_ob / full_marks) * 100, 2)
-                cursor.execute("INSERT INTO result (roll, name, course, marks_ob, full_marks, per) VALUES (?,?,?,?,?,?)", (r_roll, r_name, r_course, str(marks_ob), str(full_marks), str(percentage)))
+                cursor.execute("INSERT INTO result (roll, name, course, marks_ob, full_marks, per) VALUES (?,?,?,?,?,?)", 
+                               (r_roll, r_name, r_course, str(marks_ob), str(full_marks), str(percentage)))
                 conn.commit()
-                st.success(f"Published result successfully!")
+                st.success(f"Published result for {r_name} successfully!")
                 st.rerun()
