@@ -32,9 +32,8 @@ st.markdown(force_clean_style, unsafe_allow_html=True)
 st.title("🎓 Student Result Management System")
 st.write("---")
 
-# Connect to your existing database file
-conn = sqlite3.connect('rms.db')  
-cursor = conn.conn = sqlite3.connect('rms.db')
+# 🛠️ FIXED DATABASE CONNECTION
+conn = sqlite3.connect('rms.db')
 cursor = conn.cursor()
 
 # Create tables if they don't exist yet
