@@ -4,35 +4,48 @@ import sqlite3
 # Clean browser page setup
 st.set_page_config(page_title="Student Result Management System", layout="wide")
 
-# 🔥 FORCE HIDE ALL WATERMARKS, FOOTERS, AND MENUS (DESKTOP & MOBILE)
-force_clean_style = """
+# 🚫 STRICT COVERT MODE: Erases every single trace of Streamlit branding
+ultra_clean_style = """
     <style>
-    /* Hide top header bar completely */
-    header {visibility: hidden !important;}
+    /* 1. Completely hide the footer and any text inside it */
+    footer {
+        visibility: hidden !important;
+        display: none !important;
+        height: 0px !important;
+    }
     
-    /* Hide bottom footer watermark completely */
-    footer {visibility: hidden !important;}
+    /* 2. Remove the header bar background and default buttons */
+    header {
+        visibility: hidden !important;
+        display: none !important;
+    }
     
-    /* Hide top right burger menu button */
-    #MainMenu {visibility: hidden !important;}
+    /* 3. Target and destroy the red "Hosted with Streamlit" colored banner specifically */
+    .stAppDeployButton, .viewerBadge, [data-testid="stStatusWidget"] {
+        display: none !important;
+        visibility: hidden !important;
+    }
     
-    /* Hide the deploy and viewer status overlays */
-    .stAppDeployButton {display: none !important;}
-    .viewerBadge {display: none !important;}
+    /* 4. Hide the hamburger menu icon entirely */
+    #MainMenu {
+        visibility: hidden !important;
+        display: none !important;
+    }
     
-    /* Adjust padding so top gap looks professional */
+    /* 5. Clean padding adjustments so the top of your app looks normal */
     .block-container {
         padding-top: 2rem !important;
         padding-bottom: 0rem !important;
     }
     </style>
 """
-st.markdown(force_clean_style, unsafe_allow_html=True)
+st.markdown(ultra_clean_style, unsafe_allow_html=True)
 
+# App Title
 st.title("🎓 Student Result Management System")
 st.write("---")
 
-# 🛠️ FIXED DATABASE CONNECTION
+# Database connection
 conn = sqlite3.connect('rms.db')
 cursor = conn.cursor()
 
@@ -45,7 +58,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS course
                   (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, duration TEXT, description TEXT)''')
 conn.commit()
 
-# --- SIDEBAR NAVIGATION ---
+# --- SIDEBAR NAVIGATION (Keeps the mobile drawer working!) ---
 menu = ["📊 Dashboard", "📝 Manage Courses", "👥 Manage Students", "🏆 View & Add Results"]
 choice = st.sidebar.selectbox("Main Navigation Menu", menu)
 
