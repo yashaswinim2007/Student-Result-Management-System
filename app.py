@@ -6,8 +6,18 @@ st.set_page_config(page_title="Student Result Management System", layout="wide")
 st.title("🎓 Student Result Management System")
 st.write("---")
 
+# 🔒 HIDE STREAMLIT WATERMARKS AND MENUS
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
 # Connect to your existing database file
-conn = sqlite3.connect('rms.db')  # Connects to your main database
+conn = sqlite3.connect('rms.db')  
 cursor = conn.cursor()
 
 # Create tables if they don't exist yet
@@ -29,7 +39,6 @@ choice = st.sidebar.selectbox("Main Navigation Menu", menu)
 if choice == "📊 Dashboard":
     st.subheader("📊 System Overview Dashboard")
     
-    # Fetch live counts from your actual database tables
     try:
         total_courses = cursor.execute("SELECT COUNT(*) FROM course").fetchone()[0]
         total_students = cursor.execute("SELECT COUNT(*) FROM student").fetchone()[0]
